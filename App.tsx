@@ -33,6 +33,17 @@ function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
   }, [transactions]);
 
+  // Handle screen resize to close mobile menu
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleAddTransaction = (transaction: Transaction) => {
     setTransactions(prev => [...prev, transaction]);
     setShowForm(false);
@@ -69,7 +80,7 @@ function App() {
   }, { income: 0, expense: 0, balance: 0 });
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 font-sans">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 font-sans text-gray-900">
       
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center sticky top-0 z-20">
@@ -79,7 +90,7 @@ function App() {
           </div>
           <span className="text-lg font-bold text-gray-800">MediCaixa</span>
         </div>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600">
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 hover:text-blue-600 transition-colors">
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
@@ -87,8 +98,8 @@ function App() {
       {/* Sidebar Navigation */}
       <aside className={`
         fixed inset-y-0 left-0 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
-        md:relative md:translate-x-0 transition-transform duration-200 ease-in-out
-        w-64 bg-white border-r border-gray-200 flex flex-col z-30 shadow-xl md:shadow-none
+        md:relative md:translate-x-0 transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1)
+        w-64 bg-white border-r border-gray-200 flex flex-col z-30 shadow-2xl md:shadow-none
       `}>
         <div className="hidden md:flex p-6 border-b border-gray-100 items-center space-x-3">
           <div className="bg-blue-600 p-2 rounded-xl text-white shadow-blue-200 shadow-md">
@@ -100,7 +111,7 @@ function App() {
         <nav className="flex-1 p-4 space-y-2 mt-4 md:mt-0">
           <button
             onClick={() => navigateTo('dashboard')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${view === 'dashboard' && !showForm ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${view === 'dashboard' && !showForm ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm translate-x-1' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
           >
             <LayoutDashboard size={20} />
             <span>Painel Geral</span>
@@ -108,7 +119,7 @@ function App() {
           
           <button
             onClick={() => navigateTo('history')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${view === 'history' && !showForm ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${view === 'history' && !showForm ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm translate-x-1' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
           >
             <List size={20} />
             <span>Histórico</span>
@@ -116,7 +127,7 @@ function App() {
 
           <button
              onClick={() => navigateTo('insights')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${view === 'insights' && !showForm ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${view === 'insights' && !showForm ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm translate-x-1' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'}`}
           >
             <Activity size={20} />
             <span>Análise IA</span>
@@ -126,7 +137,7 @@ function App() {
         <div className="p-4 border-t border-gray-100">
           <button
             onClick={() => openForm(TransactionType.INCOME)}
-            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-blue-200 flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.02]"
+            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-blue-200 flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.02] active:scale-95"
           >
             <Plus size={20} />
             <span>Novo Lançamento</span>
@@ -137,7 +148,7 @@ function App() {
       {/* Overlay for mobile menu */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden backdrop-blur-sm transition-opacity"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -168,19 +179,19 @@ function App() {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <button 
                   onClick={() => openForm(TransactionType.INCOME)}
-                  className="flex items-center justify-center space-x-2 p-4 bg-green-50 border border-green-100 rounded-xl hover:bg-green-100 transition-colors group cursor-pointer"
+                  className="flex items-center justify-center space-x-2 p-4 bg-white border border-green-100 rounded-xl hover:bg-green-50 hover:border-green-200 transition-all group cursor-pointer shadow-sm hover:shadow-md"
                 >
-                  <div className="bg-green-500 rounded-full p-1 text-white group-hover:scale-110 transition-transform">
-                    <Plus size={16} />
+                  <div className="bg-green-100 rounded-full p-2 text-green-600 group-hover:scale-110 transition-transform">
+                    <Plus size={18} />
                   </div>
                   <span className="font-semibold text-green-700">Adicionar Receita</span>
                 </button>
                 <button 
                   onClick={() => openForm(TransactionType.EXPENSE)}
-                  className="flex items-center justify-center space-x-2 p-4 bg-red-50 border border-red-100 rounded-xl hover:bg-red-100 transition-colors group cursor-pointer"
+                  className="flex items-center justify-center space-x-2 p-4 bg-white border border-red-100 rounded-xl hover:bg-red-50 hover:border-red-200 transition-all group cursor-pointer shadow-sm hover:shadow-md"
                 >
-                  <div className="bg-red-500 rounded-full p-1 text-white group-hover:scale-110 transition-transform">
-                    <Plus size={16} />
+                  <div className="bg-red-100 rounded-full p-2 text-red-600 group-hover:scale-110 transition-transform">
+                    <Plus size={18} />
                   </div>
                   <span className="font-semibold text-red-700">Adicionar Despesa</span>
                 </button>

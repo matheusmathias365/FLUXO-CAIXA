@@ -12,6 +12,25 @@
         font-family: 'Inter', sans-serif;
         background-color: #f3f4f6;
       }
+      
+      /* Animações personalizadas */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+      }
+      
+      .animate-fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+      }
     </style>
   <script type="importmap">
 {
@@ -29,5 +48,6 @@
 </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>
